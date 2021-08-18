@@ -1,26 +1,28 @@
 package br.com.mesttra.medicaldep.service;
 
-import br.com.mesttra.medicaldep.amqp.AMQPConfig;
-import br.com.mesttra.medicaldep.amqp.PlayerMessage;
 import br.com.mesttra.medicaldep.entity.Admission;
 import br.com.mesttra.medicaldep.repository.AdmissionRepository;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import br.com.mesttra.medicaldep.rest.UnavailabilityClient;
+
 import org.springframework.stereotype.Service;
 
 @Service
 public class AdmissionService {
 
     AdmissionRepository admissionRepository;
-    RabbitTemplate rabbitTemplate;
+//    RabbitTemplate rabbitTemplate;
+    
+    UnavailabilityClient unavailabilityClient;
 
-    public AdmissionService(AdmissionRepository admissionRepository, RabbitTemplate rabbitTemplate) {
+    public AdmissionService(AdmissionRepository admissionRepository, UnavailabilityClient unavailabilityClient) {
         this.admissionRepository = admissionRepository;
-        this.rabbitTemplate = rabbitTemplate;
+        this.unavailabilityClient = unavailabilityClient;
+//        this.rabbitTemplate = rabbitTemplate;
     }
 
     public Admission registerAdmission(Admission admission) {
-        PlayerMessage playerMessage = new PlayerMessage(admission.getPlayerId());
-        rabbitTemplate.convertAndSend(AMQPConfig.EXCHANGE_NAME, AMQPConfig.ROUTING_KEY, playerMessage);
+    	this.unavailabilityClient.sendMail(admission.getPlayerId());
+//        rabbitTemplate.convertAndSend(AMQPConfig.EXCHANGE_NAME, AMQPConfig.ROUTING_KEY, playerMessage);
         return  admissionRepository.save(admission);
     }
 }

@@ -8,7 +8,9 @@ import java.io.Serializable;
 @Data
 public class PlayerMessage implements Serializable {
 
-    public PlayerMessage(Long id) {
+	private static final long serialVersionUID = -309157449254839576L;
+
+	public PlayerMessage(Long id) {
         this.id = id;
     }
 
